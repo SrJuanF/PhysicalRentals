@@ -1,0 +1,38 @@
+{
+  "name": "fd-physicalloans",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@apollo/client": "^3.13.8",
+    "@supabase/supabase-js": "^2.50.2",
+    "@walletconnect/ethereum-provider": "^2.21.4",
+    "autoprefixer": "^10.4.21",
+    "axios": "^1.10.0",
+    "form-data": "^4.0.3",
+    "formidable": "^3.5.4",
+    "graphql": "^16.11.0",
+    "lucide-react": "^0.525.0",
+    "magic-sdk": "^29.1.0",
+    "moralis": "^2.27.2",
+    "next": "^13.4.19",
+    "postcss": "^8.5.6",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-moralis": "^1.4.2",
+    "web3uikit": "^1.0.4"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "dotenv": "^17.0.0",
+    "eslint": "^9",
+    "eslint-config-next": "15.3.4",
+    "tailwindcss": "^4.1.11"
+  }
+}

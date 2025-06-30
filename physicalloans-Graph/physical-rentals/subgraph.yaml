@@ -1,0 +1,67 @@
+specVersion: 1.3.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: PhysicalRental
+    network: fuji
+    source:
+      address: "0xDb45a5c3b64EB27571DdF8067A5cFfbCD3ea9d1b"
+      abi: PhysicalRental
+      startBlock: 42727074
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - Approval
+        - ApprovalForAll
+        - BatchMetadataUpdate
+        - MetadataUpdate
+        - OwnershipTransferred
+        - RelistToolAvailable
+        - RequestFulfilled
+        - RequestSent
+        - ToolDamageTransport
+        - ToolDamaged
+        - ToolInspected
+        - ToolListed
+        - ToolPenalized
+        - ToolRented
+        - ToolRequested
+        - ToolReturned
+        - ToolSended
+        - Transfer
+        - errorResponseRecv
+        - reportUser
+      abis:
+        - name: PhysicalRental
+          file: ./abis/PhysicalRental.json
+      eventHandlers:
+        - event: RelistToolAvailable(indexed uint256,indexed address,uint256,uint256,uint8,indexed uint8)
+          handler: handleRelistToolAvailable
+        - event: ToolDamageTransport(uint256)
+          handler: handleToolDamageTransport
+        - event: ToolDamaged(uint256)
+          handler: handleToolDamaged
+        - event: ToolInspected(indexed uint256,indexed uint8)
+          handler: handleToolInspected
+        - event: ToolListed(indexed uint256,indexed address,uint256,uint256,uint8,indexed uint8)
+          handler: handleToolListed
+        - event: ToolPenalized(uint256,address)
+          handler: handleToolPenalized
+        - event: ToolRented(indexed uint256,indexed address,uint256,uint256,uint256,indexed uint8)
+          handler: handleToolRented
+        - event: ToolRequested(indexed uint256,indexed address,uint256,uint256,uint256,indexed uint8)
+          handler: handleToolRequested
+        - event: ToolReturned(indexed uint256,indexed uint8)
+          handler: handleToolReturned
+        - event: ToolSended(indexed uint256,indexed uint8)
+          handler: handleToolSended
+        - event: errorResponseRecv(indexed bytes32,bytes)
+          handler: handleerrorResponseRecv
+        - event: reportUser(indexed address,uint256,bool)
+          handler: handlereportUser
+      file: ./src/physical-rental.ts

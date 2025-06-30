@@ -1,0 +1,98 @@
+.custom-card {
+  background: #fdfdfd;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  padding: 20px;
+  max-width: 320px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  margin: 15px;
+}
+
+.custom-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+}
+
+.card-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 5px;
+}
+
+.card-description {
+  font-size: 0.95rem;
+  color: #555;
+  margin-bottom: 15px;
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+}
+
+.card-meta {
+  font-weight: bold;
+  color: #34495e;
+}
+
+.card-owner {
+  font-style: italic;
+  font-size: 0.85rem;
+  color: #7f8c8d;
+}
+
+.card-image {
+  border-radius: 10px;
+  object-fit: cover;
+  margin: 10px 0;
+}
+
+.card-status {
+  font-weight: bold;
+  text-align: center;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+/* Estado por color */
+/* status 0 → Available → Verde */
+.status-available {
+  color: #ffffff;
+  background-color: #16a34a; /* Tailwind: green-600 */
+}
+
+/* status 1 → Requested → Marrón */
+.status-requested {
+  color: #ffffff;
+  background-color: #8b4513; /* Marrón */
+}
+
+/* status 2 → Rented → Amarillo */
+.status-rented {
+  color: #1a1a1a;
+  background-color: #facc15; /* Tailwind: yellow-500 */
+}
+
+/* status 3 → Returned → Naranja */
+.status-returned {
+  color: #ffffff;
+  background-color: #f97316; /* Tailwind: orange-500 */
+}
+
+/* status 4 → Inspected → Negro */
+.status-inspected {
+  color: #ffffff;
+  background-color: #000000;
+}
+
+.card-info {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
