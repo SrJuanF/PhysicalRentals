@@ -35,9 +35,7 @@ export default function NFTBox({
     condition
 }) {
     const { isWeb3Enabled, account } = useMoralis()
-    const [imageURI, setImageURI] = useState(
-        "https://ethic.es/wp-content/uploads/2023/03/imagen.jpg"
-    )
+    const [imageURI, setImageURI] = useState()
     const [tokenName, setTokenName] = useState("")
     const [tokenDescription, setTokenDescription] = useState("")
 
@@ -60,7 +58,7 @@ export default function NFTBox({
     })
     async function updateUI() {
         const tokenURI = await getTokenURI()
-        console.log(`The TokenURI is ${tokenURI}`)
+        console.log("TokenURI: ", tokenURI)
         if (tokenURI) {
             // IPFS Gateway: A server that will return IPFS files from a "normal" URL.
             //const requestURL = tokenURI.replace("ipfs://", "https://ipfs.io/ipfs/")
@@ -134,22 +132,22 @@ export default function NFTBox({
                             depositUsEt={depositUsEt}
                             onClose={() => setShowModalRent(false)}
                         />
-                        <ToolActionModal
+                        {/*<ToolActionModal
                             isVisible={showModalInspect}
                             tokenId={tokenId}
                             nftAddress={nftAddress}
                             action={STATUS_LABELS[status]}
                             onClose={() => setShowModalInspect(false)}
-                        />
+                        />*/}
 
                         <div className="custom-card" onClick={handleCardClick}>
-                            <h3 className="card-title">{tokenName}</h3>
-                            <p className="card-description">{tokenDescription}</p>
+                            <div className="card-meta">#{tokenId}</div>
+                                <div className="card-owner">Owned by {formattedOwnerAddress}</div>
+                            
 
                             <div className="card-content">
-                                <div className="card-meta">#{tokenId}</div>
-                                <div className="card-owner">Owned by {formattedOwnerAddress}</div>
-
+                                <h3 className="card-title">{tokenName}</h3>
+                                <p className="card-description">{tokenDescription}</p>
                                 <Image
                                     loader={() => imageURI}
                                     src={imageURI}

@@ -1,42 +1,6 @@
-type ActiveItem @entity(immutable: false){
-  id: ID!
-  toolId: BigInt! # uint256
-  owner: Bytes! # address
-  rentalPriceUSET: BigInt! # uint256
-  depositUsEt: BigInt! # uint256
-  renter: Bytes! # address
-  rentalDuration: BigInt! # uint256
-  status: Int! # uint8
-  condition: Int! #uint8
-}
-
-
-type ToolPenalized @entity(immutable: false){
-  id: ID!
-  toolId: BigInt! # uint256
-  renter: Bytes! # address
-}
-
-type ToolDamaged @entity(immutable: false){
-  id: ID!
-  toolId: BigInt! # uint256
-}
-
-type reportUser @entity(immutable: false){
-  id: ID!
-  twister: Bytes! # address
-  toolId: BigInt! # uint256
-  toolWorked: Boolean! # bool
-}
-
-type ToolDamageTransport @entity(immutable: false){
-  id: ID!
-  toolId: BigInt! # uint256
-}
-
-type errorResponseRecv @entity(immutable: false){
+type ExampleEntity @entity(immutable: true) {
   id: Bytes!
-  requestId: Bytes! # bytes
-  lastError: Bytes! # bytes
+  count: BigInt!
+  owner: Bytes! # address
+  approved: Bytes! # address
 }
-

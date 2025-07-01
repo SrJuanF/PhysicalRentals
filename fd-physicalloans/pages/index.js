@@ -16,8 +16,6 @@ export default function Home() {
         skip: !isWeb3Enabled || !isClient,
     })
 
-    
-
     useEffect(() => {
         setIsClient(true)
     }, [])
@@ -25,14 +23,14 @@ export default function Home() {
     console.log("Listed NFTs:", listedNfts)
     console.log("Loading:", loading, "Error:", error)
 
-    useEffect(() => {
+    /*useEffect(() => {
         fetch(process.env.NEXT_PUBLIC_SUBGRAPH_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 query: `
                     {
-                        activeItems(first: 5, orderBy: blockTimestamp, orderDirection: desc) {
+                        activeItems(first: 5) {
                             id
                             toolId
                             owner
@@ -50,17 +48,17 @@ export default function Home() {
             .then(res => res.json())
             .then(data => console.log("Manual fetch result:", data))
             .catch(err => console.error("Fetch error:", err))
-    }, [])
+    }, [])*/
 
     return (
         <div className="main-container">
             <h1 className="title">Artifacts</h1>
             <div className="nft-grid">
                 {isWeb3Enabled && chainId ? (
-                    loading || (listedNfts?.activeItems.length === 0 || listedNfts === undefined) ? (
+                    loading || (!listedNfts?.activeItems || listedNfts === undefined) ? (
                         <div className="loading">Loading...</div>
                     ) : (
-                        listedNfts?.activeItems.map((nft) => {
+                        listedNfts.activeItems.map((nft) => {
                             const { toolId, owner, rentalPriceUSET, depositUsEt, status, renter, rentalDuration, condition} = nft
 
                             return PhysicalRentalAddress ? (
@@ -74,7 +72,7 @@ export default function Home() {
                                     renter={renter}
                                     rentalDuration={rentalDuration}
                                     condition={condition}
-                                    key={`${PhysicalRentalAddress}${id}`}
+                                    key={`${PhysicalRentalAddress}${toolId}`}
                                 />
                             ) : (
                                 <div className="network-error">

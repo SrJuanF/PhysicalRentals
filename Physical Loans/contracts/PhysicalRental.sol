@@ -137,7 +137,7 @@ contract PhysicalRental is FunctionsClient, AutomationCompatibleInterface, ERC72
         if(tool.owner != msg.sender) {
             revert NotYourTool(toolId, msg.sender);
         }
-        if(tool.status != toolstatus.Inspected || tool.status != toolstatus.Available) {
+        if(tool.status != toolstatus.Inspected && tool.status != toolstatus.Available) {
             revert toolNotEditable(toolId);
         }
         tool.rentalPriceUSET = newrentalPriceUSday;
@@ -250,7 +250,7 @@ contract PhysicalRental is FunctionsClient, AutomationCompatibleInterface, ERC72
     // Receive the weather in the city requested
     function fulfillRequest( bytes32 requestId, bytes memory response, bytes memory err) internal override {
         s_lastRequest.lError = err;
-        if(err.length > 0 || response.length != 1){
+        if(err.length > 0){
             emit errorResponseRecv(requestId, err);
             revert errorResponse(err);
         }
@@ -260,7 +260,9 @@ contract PhysicalRental is FunctionsClient, AutomationCompatibleInterface, ERC72
         Tool storage tool = s_tools[s_lastRequest.toolId];
         bool work = s_lastRequest.actualWorked;
         
-        uint8 value = uint8(response[0]) - 48; // Convierte ASCII "0"-"3" en 0-3
+        //uint8 value = uint8(response[0]) - 48; // Convierte ASCII "0"-"3" en 0-3
+        //abi.decode(response, (uint256));
+        uint256 value = abi.decode(response, (uint256));
 
         if(tool.status == toolstatus.Returned){
             if(value == 3){

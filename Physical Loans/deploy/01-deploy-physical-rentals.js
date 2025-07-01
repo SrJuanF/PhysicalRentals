@@ -33,7 +33,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 
 module.exports.tags = ["all", "physicalRentals"]
 
-//Fuji = https://testnet.snowtrace.io/address/0xDb45a5c3b64EB27571DdF8067A5cFfbCD3ea9d1b
+//Fuji = https://testnet.snowtrace.io/address/0x5b6930999c6D50B18D1a97bF9fA052a128EcF7eB
 //Sepolia = 
 
 const source = `

@@ -2,7 +2,7 @@ import { gql } from "@apollo/client"
 
 const GET_ACTIVE_ITEMS = gql`
     {
-        activeItems(first: 5, orderBy: blockTimestamp, orderDirection: desc) {
+        activeItems(first: 5) {
             id
             toolId
             owner
