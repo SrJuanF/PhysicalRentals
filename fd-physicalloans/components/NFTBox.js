@@ -3,7 +3,6 @@ import { useWeb3Contract, useMoralis } from "react-moralis"
 import PhysicalRentalAbi from "@/constants/PhysicalRental.json"
 import Image from "next/image"
 import { Card } from "web3uikit"
-import { ethers } from "ethers"
 import ToolActionModal from "./InspectTool"
 import UpdateListingModal from "./Lender/UpdateListingModal"
 import RentToolModal from "./Renter/RentToolModal"
@@ -23,17 +22,7 @@ const truncateStr = (fullStr, strLen) => {
     )
 }
 
-export default function NFTBox({
-    nftAddress,
-    tokenId,
-    Owner,
-    rentalPriceUSET,
-    depositUsEt,
-    status,
-    renter,
-    rentalDuration,
-    condition
-}) {
+export default function NFTBox({ nftAddress, tokenId, Owner, rentalPriceUSET, depositUsEt, status, renter, rentalDuration, condition}) {
     const { isWeb3Enabled, account } = useMoralis()
     const [imageURI, setImageURI] = useState()
     const [tokenName, setTokenName] = useState("")
@@ -48,6 +37,7 @@ export default function NFTBox({
         3: "Used with wear, functional",
     }
     const ShowCondition = conditionMap[condition]
+
     const { runContractFunction: getTokenURI } = useWeb3Contract({
         abi: PhysicalRentalAbi,
         contractAddress: nftAddress,
@@ -58,7 +48,7 @@ export default function NFTBox({
     })
     async function updateUI() {
         const tokenURI = await getTokenURI()
-        console.log("TokenURI: ", tokenURI)
+        //console.log("TokenURI: ", tokenURI)
         if (tokenURI) {
             // IPFS Gateway: A server that will return IPFS files from a "normal" URL.
             //const requestURL = tokenURI.replace("ipfs://", "https://ipfs.io/ipfs/")
@@ -68,7 +58,6 @@ export default function NFTBox({
             setImageURI(imageURI)
             setTokenName(tokenURIResponse.name)
             setTokenDescription(tokenURIResponse.description)
-
         }
     }
     useEffect(() => {
@@ -91,6 +80,9 @@ export default function NFTBox({
 
     const isRenterByUser = renter.toLocaleLowerCase() == account.toLocaleLowerCase()
 
+    console.log(STATUS_LABELS[status])
+    console.log(rentalPriceUSET)
+    
 
     const handleCardClick = () => {
         if (isOwnedByUser) {
@@ -142,9 +134,8 @@ export default function NFTBox({
 
                         <div className="custom-card" onClick={handleCardClick}>
                             <div className="card-meta">#{tokenId}</div>
-                                <div className="card-owner">Owned by {formattedOwnerAddress}</div>
+                            <div className="card-owner">Owned by {formattedOwnerAddress}</div>
                             
-
                             <div className="card-content">
                                 <h3 className="card-title">{tokenName}</h3>
                                 <p className="card-description">{tokenDescription}</p>

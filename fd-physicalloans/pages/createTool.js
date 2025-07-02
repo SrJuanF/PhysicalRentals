@@ -67,13 +67,13 @@ export default function CreateTool() {
         setupUI()
     }, [earnings, account, isWeb3Enabled, chainId, web3])
 
-    const handleListTools = async (tokenURI, rentalPriceUSday, depositUsd, condition) => {
+    const handleListTools = async (tokenURI, rentalPriceUSdayy, depositUsdd, conditionn) => {
         try {
             const tx = await contract.listTool(
                 tokenURI,
-                ethers.BigNumber.from(rentalPriceUSday.toString()),
-                ethers.BigNumber.from(depositUsd.toString()),
-                Number(condition),
+                ethers.BigNumber.from(rentalPriceUSdayy.toString()),
+                ethers.BigNumber.from(depositUsdd.toString()),
+                Number(conditionn),
                 overrides
             )
             const receipt = await tx.wait()
@@ -127,6 +127,13 @@ export default function CreateTool() {
             return
         }
         const condition = conditionMap[valCondition]
+        
+        if(!rentalPriceUSday || +rentalPriceUSday <= 0 || 
+            !depositUsd || +depositUsd <= 0 || 
+            !Number.isInteger(+rentalPriceUSday) || !Number.isInteger(+depositUsd)){
+            dispatch({ type: "error", message: "Enter valid rental values that are integers and greater than zero", title: "Invalid rental values", position: "topR",})
+            return
+        }
 
         if (!imageFile) {
             dispatch({ type: "error", message: "You must upload an image", title: "Missing image", position: "topR",})

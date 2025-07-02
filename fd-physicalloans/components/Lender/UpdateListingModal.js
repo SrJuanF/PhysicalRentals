@@ -6,11 +6,13 @@ import {ethers} from "ethers"
 
 export default function UpdateListingModal({ nftAddress, tokenId, isVisible, onClose }) {
     const dispatch = useNotification()
+    const { isWeb3Enabled, account, web3 } = useMoralis()
+    const [contract, setEtherContract] = useState(null)
     const [newPriceUSD, setNewPriceUSD] = useState("")
     const [newDepositUSD, setNewDepositUSD] = useState("")
     const [newCondition, setNewCondition] = useState("")
-    const { isWeb3Enabled, account, web3 } = useMoralis()
-    const [contract, setEtherContract] = useState(null)
+
+    const [isLoading, setIsLoading] = useState(false)
 
     useEffect(() => {
             if (isWeb3Enabled && web3.provider && account) {
@@ -42,18 +44,25 @@ export default function UpdateListingModal({ nftAddress, tokenId, isVisible, onC
         setNewPriceUSD("")
         setNewDepositUSD("")
         setNewCondition("")
+        setIsLoading(false)
     }
 
     const handleSubmit = async () => {
-        if (+newPriceUSD <= 0 || +newDepositUSD <= 0) {
+        if(isLoading) return
+        setIsLoading(true)
+
+        if (!newPriceUSD || +newPriceUSD <= 0 || 
+            !newDepositUSD || +newDepositUSD <= 0 ||
+            !Number.isInteger(+newPriceUSD) || !Number.isInteger(+newDepositUSD)) {
             dispatch({
                 type: "error",
-                message: "Values must be greater than 0",
+                message: "Values must be greater than 0 and integers",
                 title: "Invalid fields",
                 position: "topR",
             })
             return
         }
+
         const conditionMap = {
             "New": 1,
             "Used in good condition": 2,
@@ -79,12 +88,11 @@ export default function UpdateListingModal({ nftAddress, tokenId, isVisible, onC
                 Number(conditionNumeric),
             )
             const receipt = await tx.wait()
-            console.log("Transaction confirmed:", receipt)
+            //console.log("Transaction confirmed:", receipt)
             handleSuccess()
         } catch (error) {
             console.error("Error listing tool:", error)
-            dispatch({ type: "error", message: error.message || String(error), title: "Transaction Failed", position: "topR",
-            })
+            dispatch({ type: "error", message: error.message || String(error), title: "Transaction Failed", position: "topR",})
         }
         
     }
@@ -93,11 +101,12 @@ export default function UpdateListingModal({ nftAddress, tokenId, isVisible, onC
         <Modal
             title={"Tool Update"}
             isVisible={isVisible}
-            isCentered={true}
-            canOverflow={true}
             onCancel={onClose}
             onCloseButtonPressed={onClose}
             onOk={handleSubmit}
+            isCentered={true}
+            canOverflow={true}
+            okButtonProps={{ loading: isLoading, disabled: isLoading }}
         >
             <div className="form-group-parent">
                 <div className="form-group">

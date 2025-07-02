@@ -27,7 +27,7 @@ export default async function handler(req, res) {
     const description = fields.description[0];
     const type = fields.type[0];
  
-    if (!name || !description || !type) {
+    if (!name || name == undefined || !description  || description == undefined || !type || type == undefined) {
       return res.status(400).json({ error: "Missing required metadata fields" });
     }
 

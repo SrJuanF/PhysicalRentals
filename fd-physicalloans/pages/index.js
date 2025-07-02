@@ -20,35 +20,8 @@ export default function Home() {
         setIsClient(true)
     }, [])
 
-    console.log("Listed NFTs:", listedNfts)
+    console.log("Listed NFTs:", listedNfts?.length)
     console.log("Loading:", loading, "Error:", error)
-
-    /*useEffect(() => {
-        fetch(process.env.NEXT_PUBLIC_SUBGRAPH_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                query: `
-                    {
-                        activeItems(first: 5) {
-                            id
-                            toolId
-                            owner
-                            rentalPriceUSET
-                            depositUsEt
-                            renter
-                            rentalDuration
-                            status
-                            condition
-                        }
-                    }
-                `,
-            }),
-        })
-            .then(res => res.json())
-            .then(data => console.log("Manual fetch result:", data))
-            .catch(err => console.error("Fetch error:", err))
-    }, [])*/
 
     return (
         <div className="main-container">

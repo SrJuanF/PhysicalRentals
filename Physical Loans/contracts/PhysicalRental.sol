@@ -185,8 +185,8 @@ contract PhysicalRental is FunctionsClient, AutomationCompatibleInterface, ERC72
         tool.status = toolstatus.Requested;
         tool.renter = msg.sender;
         tool.rentalDuration = rentalDurationSeconds;
-        tool.depositUsEt = msg.value * (deposit / total);
-        tool.rentalPriceUSET = msg.value * (rentalPrice / total);
+        tool.depositUsEt = (msg.value * deposit) / total;
+        tool.rentalPriceUSET = (msg.value * rentalPrice) / total;
 
         emit ToolRequested(toolId, msg.sender, rentalDurationSeconds, tool.rentalPriceUSET, tool.depositUsEt, toolstatus.Requested);
     }
@@ -249,16 +249,17 @@ contract PhysicalRental is FunctionsClient, AutomationCompatibleInterface, ERC72
 
     // Receive the weather in the city requested
     function fulfillRequest( bytes32 requestId, bytes memory response, bytes memory err) internal override {
-        s_lastRequest.lError = err;
+        RequestData memory req = s_lastRequest;
+        if (req.requestId != requestId) {
+            revert UnexpectedRequestID(requestId); // Check if request IDs match
+        }
         if(err.length > 0){
+            s_lastRequest.lError = err;
             emit errorResponseRecv(requestId, err);
             revert errorResponse(err);
         }
-        if (s_lastRequest.requestId != requestId) {
-            revert UnexpectedRequestID(requestId); // Check if request IDs match
-        }
-        Tool storage tool = s_tools[s_lastRequest.toolId];
-        bool work = s_lastRequest.actualWorked;
+        Tool storage tool = s_tools[req.toolId];
+        bool work = req.actualWorked;
         
         //uint8 value = uint8(response[0]) - 48; // Convierte ASCII "0"-"3" en 0-3
         //abi.decode(response, (uint256));
@@ -371,8 +372,8 @@ contract PhysicalRental is FunctionsClient, AutomationCompatibleInterface, ERC72
                 revert NotOverdue();
             }
             // Penalize: deposit goes to owner
-            s_balances[tool.owner] += tool.depositUsEt * 20 / 100; 
-            tool.depositUsEt = tool.depositUsEt * 80 / 100; 
+            s_balances[tool.owner] += (tool.depositUsEt * 20) / 100; 
+            tool.depositUsEt = (tool.depositUsEt * 80) / 100; 
 
             if(tool.depositUsEt > 0){
                 rental.rentalEnd = block.timestamp + 1 days; 
