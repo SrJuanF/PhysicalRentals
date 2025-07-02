@@ -6,6 +6,7 @@ import { Card } from "web3uikit"
 import ToolActionModal from "./InspectTool"
 import UpdateListingModal from "./Lender/UpdateListingModal"
 import RentToolModal from "./Renter/RentToolModal"
+import {ethers} from "ethers"
 
 const truncateStr = (fullStr, strLen) => {
     if (fullStr.length <= strLen) return fullStr
