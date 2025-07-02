@@ -27,7 +27,7 @@ const ToolActionModal = ({ isVisible, nftAddress, tokenId, status, role, onClose
     contractAddress: nftAddress,
     functionName: "receiveTool",
     params: {
-        toolId: tokenId,
+        toolId: ethers.BigNumber.from(tokenId.toString()),
         actualWorked: true,
     },
   });
