@@ -4,6 +4,7 @@ import "@/styles/header.css"
 import "@/styles/createTool.css"
 import "@/styles/card.css"
 import "@/styles/modalDiv.css"
+import "@/styles/inspection.css";
 import { MoralisProvider } from "react-moralis"
 import Header from "@/components/Header"
 import Head from "next/head"
@@ -31,7 +32,9 @@ export default function App({ Component, pageProps }) {
                     </NotificationProvider>
                 </ApolloProvider>
             </MoralisProvider>
+            
         </div>
     )
 
 }
+

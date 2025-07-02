@@ -1,96 +1,157 @@
 import { Modal, Input, useNotification } from "web3uikit"
 import { useWeb3Contract } from "react-moralis"
-import PhysicalRentalAbi from "@/constants/PhysicalRental.json"
+import PhysicalRental from "@/constants/PhysicalRental.json"
 import { ethers } from "ethers"
 import React, { useState, useEffect } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, X } from 'lucide-react';
 
-export default function ToolActionModal({ status, role, onComplete }){
+
+const ToolActionModal = ({ isVisible, nftAddress, tokenId, status, role, onClose}) => {
   const [loading, setLoading] = useState(true);
-  const [result, setResult] = useState(null); // 'buena' o 'mala'
+  const [result, setResult] = useState(null); // resultado del intento actual
   const [attempts, setAttempts] = useState(0);
   const [resultsHistory, setResultsHistory] = useState([]);
+  const [finalResult, setFinalResult] = useState(null); // 'Work' o 'No Work'
 
-  useEffect(() => {
-    simulateAnalysis();
-  }, []);
+  const { runContractFunction: sendTool } = useWeb3Contract({ // Owner or Renter?
+    abi: PhysicalRental,
+    contractAddress: nftAddress,
+    functionName: "sendTool",
+    params: {
+      toolId: ethers.BigNumber.from(tokenId.toString()),
+      actualWorked: true,
+    },
+  });
+  const { runContractFunction: receiveTool } = useWeb3Contract({ //Owner or Renter?
+    abi: PhysicalRental,
+    contractAddress: nftAddress,
+    functionName: "receiveTool",
+    params: {
+        toolId: tokenId,
+        actualWorked: true,
+    },
+  });
+  const handleSuccess = () => {
+    dispatch({
+        type: "success",
+        message: "Tool successfully analyzed and registered",
+        title: "Success",
+        position: "topR",
+    })
+    onClose && onClose()
+    setLoading(true);
+    setResult(null);
+    setAttempts(0);
+    setResultsHistory([]);
+    setFinalResult(null);
+  }
 
   const simulateAnalysis = () => {
     setLoading(true);
     setTimeout(() => {
       const isBuena = Math.random() < 0.7;
-      const analysis = isBuena ? 'buena' : 'mala';
+      const analysis = isBuena ? 'Work' : 'No Work';
+
+      const updatedHistory = [...resultsHistory, analysis];
+      const countBuena = updatedHistory.filter((r) => r === 'Work').length;
+      const countMala = updatedHistory.filter((r) => r === 'No Work').length;
+
       setResult(analysis);
-      setResultsHistory((prev) => [...prev, analysis]);
-      setAttempts((prev) => prev + 1);
+      setResultsHistory(updatedHistory);
+      setAttempts(updatedHistory.length);
       setLoading(false);
+
+      if (countBuena === 2) {
+        setFinalResult('Work');
+      } else if (countMala === 2) {
+        setFinalResult('No Work');
+      }
     }, 2000);
   };
-
+  useEffect(() => {
+    simulateAnalysis();
+  }, []);
   const handleRetry = () => {
     simulateAnalysis();
   };
 
   const handleProceed = () => {
-    const countBuena = resultsHistory.filter((r) => r === 'buena').length;
-    const countMala = resultsHistory.filter((r) => r === 'mala').length;
-    const finalResult = countBuena >= countMala ? 'buena' : 'mala';
-    onComplete(finalResult);
-  };
-
-  const showRetry = result === 'mala' && attempts < 3;
-
-  const canProceed = () => {
-    if (role === 'owner' && status === 'Send' && result === 'mala' && attempts >= 3) {
-      return false;
+    if ((role === 'Owner' && status === 'Requested') || (role === 'Renter' && status === 'Rented')) {
+      sendTool({
+        onSuccess: handleSuccess,
+        onError: (error) => console.error("Error sending tool:", error),
+      });
+    } else if ((role === 'Owner' && status === 'Returned') || (role === 'Renter' && status === 'Sended')) {
+      receiveTool({
+        onSuccess: handleSuccess,
+        onError: (error) => console.error("Error receiving tool:", error),
+      });
     }
-    return result === 'buena' || (attempts >= 3 || (role === 'renter' || status === 'Receive'));
+    //onComplete(finalResult);
   };
+
+  const shouldRetry =
+    !finalResult && attempts < 3;
+
+  const canProceed =
+    finalResult === 'Work' ||
+    (role !== 'Owner' || status !== 'Requested'); // owner-Send necesita buena
 
   return (
-    <div className="p-6 bg-white rounded-xl shadow-xl max-w-md mx-auto mt-20 text-center space-y-4">
-      <h2 className="text-xl font-bold text-gray-800">Acción: {status}</h2>
-      <p className="text-gray-600">Rol: {role === 'owner' ? 'Propietario' : 'Arrendatario'}</p>
+    <div className="modal-overlay" style={{ display: isVisible ? 'block' : 'none' }}>
+      <div className="modal">
 
-      {loading ? (
-        <div className="flex flex-col items-center justify-center space-y-2">
-          <Loader2 className="animate-spin w-8 h-8 text-blue-600" />
-          <p>Analizando herramienta...</p>
-        </div>
-      ) : (
-        <>
-          <p className={`text-lg font-semibold ${result === 'buena' ? 'text-green-600' : 'text-red-600'}`}>
-            Resultado del análisis: {result?.toUpperCase()}
-          </p>
+        <button className="modal-close-btn" onClick={onClose} aria-label="Cerrar modal">
+          <X className="modal-close-icon" />
+        </button>
 
-          {showRetry && (
-            <button
-              onClick={handleRetry}
-              className="bg-yellow-400 hover:bg-yellow-500 px-4 py-2 rounded text-white"
-            >
-              Intentar otra vez ({3 - attempts} intentos restantes)
-            </button>
-          )}
+        <h2 className="modal-title">Action: {status === 'Requested' ? 'Send' : status === 'Rented' ? 'Return' : 'Receive'}</h2>
+        <p className="modal-role">Role: {role}</p>
 
-          {canProceed() && (
-            <button
-              onClick={handleProceed}
-              className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white"
-            >
-              Continuar con la acción
-            </button>
-          )}
-
-          {!canProceed() && !showRetry && (
-            <p className="text-sm text-red-500">
-              No se puede continuar con la acción debido al mal estado de la herramienta.
+        {loading ? (
+          <div className="modal-loading">
+            <Loader2 className="loader-icon" />
+            <p>Analyzing tool...</p>
+          </div>
+        ) : (
+          <>
+            <p className={`modal-result ${result === 'Work' ? 'good' : 'bad'}`}>
+              Result of attempt: {result?.toUpperCase()}
             </p>
-          )}
-        </>
-      )}
+
+            <p className="modal-attempts">Attempts made: {attempts}</p>
+
+            {finalResult && (
+              <p className={`modal-final ${finalResult === 'Work' ? 'good' : 'bad'}`}>
+                Final result: {finalResult.toUpperCase()}
+              </p>
+            )}
+
+            {shouldRetry && (
+              <button onClick={handleRetry} className="btn retry-btn">
+                Try Again ({3 - attempts} attempts remaining)
+              </button>
+            )}
+
+            {finalResult && canProceed && (
+              <button onClick={handleProceed} className="btn continue-btn">
+                Continue
+              </button>
+            )}
+
+            {finalResult === 'No Work' && !canProceed && (
+              <p className="modal-error">
+                You cannot proceed with this action because the final result was NO WORK.
+              </p>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
-};
+}
+
+export default ToolActionModal;
 
 
 

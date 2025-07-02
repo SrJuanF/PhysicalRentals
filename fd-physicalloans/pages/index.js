@@ -30,6 +30,8 @@ export default function Home() {
                 {isWeb3Enabled && chainId ? (
                     loading || (!listedNfts?.activeItems || listedNfts === undefined) ? (
                         <div className="loading">Loading...</div>
+                    ) : listedNfts?.activeItems.length === 0 ? (
+                        <div className="network-error">No items yet</div>
                     ) : (
                         listedNfts.activeItems.map((nft) => {
                             const { toolId, owner, rentalPriceUSET, depositUsEt, status, renter, rentalDuration, condition} = nft

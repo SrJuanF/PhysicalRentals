@@ -23,7 +23,7 @@ const truncateStr = (fullStr, strLen) => {
 }
 
 export default function NFTBox({ nftAddress, tokenId, Owner, rentalPriceUSET, depositUsEt, status, renter, rentalDuration, condition}) {
-    const { isWeb3Enabled, account } = useMoralis()
+    const { isWeb3Enabled, account, chainId } = useMoralis()
     const [imageURI, setImageURI] = useState()
     const [tokenName, setTokenName] = useState("")
     const [tokenDescription, setTokenDescription] = useState("")
@@ -88,14 +88,11 @@ export default function NFTBox({ nftAddress, tokenId, Owner, rentalPriceUSET, de
         if (isOwnedByUser) {
             if (STATUS_LABELS[status] == "Available" || STATUS_LABELS[status] == "Inspected") { //****** STUTS SENDEEED */
                 setShowMododalUpdate(true)
-            } else if (
-                STATUS_LABELS[status] == "Requested" ||
-                STATUS_LABELS[status] == "Returned"
-            ) {
+            } else if (STATUS_LABELS[status] == "Requested" || STATUS_LABELS[status] == "Returned") {
                 setShowModalInspect(true)
             }
         } else if (isRenterByUser) {
-            if (STATUS_LABELS[status] == "Rented" || STATUS_LABELS[status] == "Requested") {
+            if (STATUS_LABELS[status] == "Rented" || STATUS_LABELS[status] == "Sended") {
                 setShowModalInspect(true)
             }
         } else if (STATUS_LABELS[status] == "Available") {
@@ -124,13 +121,14 @@ export default function NFTBox({ nftAddress, tokenId, Owner, rentalPriceUSET, de
                             depositUsEt={depositUsEt}
                             onClose={() => setShowModalRent(false)}
                         />
-                        {/*<ToolActionModal
+                        <ToolActionModal
                             isVisible={showModalInspect}
-                            tokenId={tokenId}
                             nftAddress={nftAddress}
-                            action={STATUS_LABELS[status]}
+                            tokenId={tokenId}
+                            role={isOwnedByUser ? "Owner" : "Renter"}
+                            status={STATUS_LABELS[status]}
                             onClose={() => setShowModalInspect(false)}
-                        />*/}
+                        />
 
                         <div className="custom-card" onClick={handleCardClick}>
                             <div className="card-meta">#{tokenId}</div>
@@ -156,13 +154,15 @@ export default function NFTBox({ nftAddress, tokenId, Owner, rentalPriceUSET, de
                                     {ShowCondition}
                                 </div>
 
-                                {(statusLabel === "Available" || statusLabel === "Requested") && (
+                                {(statusLabel === "Available" || statusLabel === "Requested" || statusLabel === "Sended") && (
                                     <>
                                         <div className="card-info">
-                                            Daily Rental Price: {rentalPriceUSET} USD
+                                            Daily Rental Price: {status == 0 ? rentalPriceUSET : ethers.utils.formatEther(rentalPriceUSET)} {status == 0 ? "USD" :
+                                             parseInt(chainId).toString() === "43113" ? "AVAX" : "ETH"}
                                         </div>
                                         <div className="card-info">
-                                            Security Deposit: {depositUsEt} USD
+                                            Security Deposit: {status == 0 ? depositUsEt : ethers.utils.formatEther(depositUsEt)} {status == 0 ? "USD" :
+                                             parseInt(chainId).toString() === "43113" ? "AVAX" : "ETH"}
                                         </div>
                                     </>
                                 )}
