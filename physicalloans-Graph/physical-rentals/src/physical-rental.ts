@@ -1,154 +1,124 @@
-import { BigInt, Address } from "@graphprotocol/graph-ts"
+import { BigInt, Bytes } from "@graphprotocol/graph-ts"
 import {
-  RelistToolAvailable as RelistToolAvailableEvent,
-  ToolDamageTransport as ToolDamageTransportEvent,
-  ToolDamaged as ToolDamagedEvent,
-  ToolInspected as ToolInspectedEvent,
-  ToolListed as ToolListedEvent,
-  ToolPenalized as ToolPenalizedEvent,
-  ToolRented as ToolRentedEvent,
-  ToolRequested as ToolRequestedEvent,
-  ToolReturned as ToolReturnedEvent,
-  ToolSended as ToolSendedEvent,
-  errorResponseRecv as errorResponseRecvEvent,
-  reportUser as reportUserEvent
-} from "../generated/PhysicalRental/PhysicalRental"
-import {
+  PhysicalRental,
+  Approval,
+  ApprovalForAll,
+  BatchMetadataUpdate,
+  MetadataUpdate,
+  OwnershipTransferred,
+  RelistToolAvailable,
+  RequestFulfilled,
+  RequestSent,
   ToolDamageTransport,
   ToolDamaged,
+  ToolInspected,
+  ToolListed,
   ToolPenalized,
+  ToolRented,
+  ToolRequested,
+  ToolReturned,
+  ToolSended,
+  Transfer,
   errorResponseRecv,
-  reportUser,
-  ActiveItem
-} from "../generated/schema"
+  reportUser
+} from "../generated/PhysicalRental/PhysicalRental"
+import { ExampleEntity } from "../generated/schema"
 
-/*function getIdFromEventParams(toolId: BigInt, owner: Address): string {
-    return toolId.toString() + "-" + owner.toHexString();
-}*/
+export function handleApproval(event: Approval): void {
+  // Entities can be loaded from the store using an ID; this ID
+  // needs to be unique across all entities of the same type
+  const id = event.transaction.hash.concat(
+    Bytes.fromByteArray(Bytes.fromBigInt(event.logIndex))
+  )
+  let entity = ExampleEntity.load(id)
 
-export function handleToolListed(event: ToolListedEvent): void {
-  let entity = new ActiveItem(event.params.id.toString())
-  entity.toolId = event.params.id
+  // Entities only exist after they have been saved to the store;
+  // `null` checks allow to create entities on demand
+  if (!entity) {
+    entity = new ExampleEntity(id)
+
+    // Entity fields can be set using simple assignments
+    entity.count = BigInt.fromI32(0)
+  }
+
+  // BigInt and BigDecimal math are supported
+  entity.count = entity.count + BigInt.fromI32(1)
+
+  // Entity fields can be set based on event parameters
   entity.owner = event.params.owner
-  entity.rentalPriceUSET = event.params.rentalPriceUSET
-  entity.depositUsEt = event.params.depositUsEt
-  entity.condition = event.params.condition
-  entity.status = event.params.status
-  entity.renter = Address.fromString("0x0000000000000000000000000000000000000000")
-  entity.rentalDuration = BigInt.fromI32(0)
+  entity.approved = event.params.approved
+
+  // Entities can be written to the store with `.save()`
   entity.save()
+
+  // Note: If a handler doesn't require existing field values, it is faster
+  // _not_ to load the entity from the store. Instead, create it fresh with
+  // `new Entity(...)`, set the fields that should be updated and save the
+  // entity back to the store. Fields that were not set or unset remain
+  // unchanged, allowing for partial updates to be applied.
+
+  // It is also possible to access smart contracts from mappings. For
+  // example, the contract that has emitted the event can be connected to
+  // with:
+  //
+  // let contract = Contract.bind(event.address)
+  //
+  // The following functions can then be called on this contract to access
+  // state variables and other data:
+  //
+  // - contract.balanceOf(...)
+  // - contract.checkUpkeep(...)
+  // - contract.getActiveRental(...)
+  // - contract.getApproved(...)
+  // - contract.getBalance(...)
+  // - contract.getMinMint(...)
+  // - contract.getRentalNearLine(...)
+  // - contract.getTool(...)
+  // - contract.isApprovedForAll(...)
+  // - contract.name(...)
+  // - contract.owner(...)
+  // - contract.ownerOf(...)
+  // - contract.receiveTool(...)
+  // - contract.s_lastRequest(...)
+  // - contract.supportsInterface(...)
+  // - contract.symbol(...)
+  // - contract.tokenURI(...)
 }
 
-export function handleRelistToolAvailable(
-  event: RelistToolAvailableEvent
-): void {
+export function handleApprovalForAll(event: ApprovalForAll): void {}
 
-  let itemListed = ActiveItem.load(event.params.id.toString())
+export function handleBatchMetadataUpdate(event: BatchMetadataUpdate): void {}
 
-  if (!itemListed) {
-    itemListed = new ActiveItem(event.params.id.toString())
-  }
+export function handleMetadataUpdate(event: MetadataUpdate): void {}
 
-  itemListed.rentalPriceUSET = event.params.rentalPriceUSET
-  itemListed.depositUsEt = event.params.depositUsEt
-  itemListed.condition = event.params.condition
-  itemListed.status = event.params.status
-  itemListed.renter = Address.fromString("0x0000000000000000000000000000000000000000")
-  itemListed.rentalDuration = BigInt.fromI32(0)
+export function handleOwnershipTransferred(event: OwnershipTransferred): void {}
 
-  itemListed.save()
-}
-export function handleToolRequested(event: ToolRequestedEvent): void {
-  let itemListed = ActiveItem.load(event.params.id.toString())
-  if (!itemListed) {
-    itemListed = new ActiveItem(event.params.id.toString())
-  }
+export function handleRelistToolAvailable(event: RelistToolAvailable): void {}
 
-  itemListed.renter = event.params.renter
-  itemListed.rentalDuration = event.params.rentalDuration
-  itemListed.rentalPriceUSET = event.params.rentalPriceUSET
-  itemListed.depositUsEt = event.params.depositUsEt
-  itemListed.status = event.params.status
-  itemListed.save()
-}
+export function handleRequestFulfilled(event: RequestFulfilled): void {}
 
+export function handleRequestSent(event: RequestSent): void {}
 
-export function handleToolRented(event: ToolRentedEvent): void {
-  let itemListed = ActiveItem.load(event.params.id.toString())
+export function handleToolDamageTransport(event: ToolDamageTransport): void {}
 
-  if (!itemListed) {
-    itemListed = new ActiveItem(event.params.id.toString())
-  }
+export function handleToolDamaged(event: ToolDamaged): void {}
 
-  itemListed.renter = event.params.renter
-  itemListed.rentalDuration = event.params.duration
-  itemListed.rentalPriceUSET = event.params.rentalPriceUSET
-  itemListed.depositUsEt = event.params.depositUsEt
-  itemListed.status = event.params.status
+export function handleToolInspected(event: ToolInspected): void {}
 
-  itemListed.save()
-}
-export function handleToolSended(event: ToolSendedEvent): void {
-  let itemListed = ActiveItem.load(event.params.id.toString())
-  if (!itemListed) {
-    itemListed = new ActiveItem(event.params.id.toString())
-  }
-  itemListed.status = event.params.status
-  itemListed.save()
-}
-export function handleToolReturned(event: ToolReturnedEvent): void {
-  let itemListed = ActiveItem.load(event.params.id.toString())
-  if (!itemListed) {
-    itemListed = new ActiveItem(event.params.id.toString())
-  }
-  itemListed.status = event.params.status
-  itemListed.save()
-}
+export function handleToolListed(event: ToolListed): void {}
 
-export function handleToolInspected(event: ToolInspectedEvent): void {
-  let itemListed = ActiveItem.load(event.params.id.toString())
-  if (!itemListed) {
-    itemListed = new ActiveItem(event.params.id.toString())
-  }
-  itemListed.status = event.params.status
-  itemListed.save()
-}
-export function handleToolPenalized(event: ToolPenalizedEvent): void {
-  let entity = new ToolPenalized(
-    event.params.id.toString()
-  )
-  entity.toolId = event.params.id
-  entity.renter = event.params.renter
+export function handleToolPenalized(event: ToolPenalized): void {}
 
-  entity.save()
-}
-export function handleerrorResponseRecv(event: errorResponseRecvEvent): void {
-  let entity = new errorResponseRecv(event.params.requestId)
-  entity.lastError = event.params.lastError
-  entity.requestId = event.params.requestId
-  entity.save()
-}
+export function handleToolRented(event: ToolRented): void {}
 
-export function handlereportUser(event: reportUserEvent): void {
-  let entity = new reportUser(
-    event.params.id.toString()
-  )
-  entity.twister = event.params.twister
-  entity.toolId = event.params.id
-  entity.toolWorked = event.params.toolWorked
-  entity.save()
-}
+export function handleToolRequested(event: ToolRequested): void {}
 
-export function handleToolDamageTransport(
-  event: ToolDamageTransportEvent
-): void {
-  let entity = new ToolDamageTransport(event.params.id.toString())
-  entity.toolId = event.params.id
-  entity.save()
-}
+export function handleToolReturned(event: ToolReturned): void {}
 
-export function handleToolDamaged(event: ToolDamagedEvent): void {
-  let entity = new ToolDamaged(event.params.id.toString())
-  entity.toolId = event.params.id
-  entity.save()
-}
+export function handleToolSended(event: ToolSended): void {}
+
+export function handleTransfer(event: Transfer): void {}
+
+export function handleerrorResponseRecv(event: errorResponseRecv): void {}
+
+export function handlereportUser(event: reportUser): void {}

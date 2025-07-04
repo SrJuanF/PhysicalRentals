@@ -11,6 +11,8 @@ import {FunctionsClient} from "@chainlink/contracts/src/v0.8/functions/v1_0_0/Fu
 import {FunctionsRequest} from "@chainlink/contracts/src/v0.8/functions/v1_0_0/libraries/FunctionsRequest.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
+//import "hardhat/console.sol";
+//import "@openzeppelin/contracts/utils/console.sol";
 
 error InsufficientMint(address user);
 error NothingToWithdraw(address user);
@@ -213,61 +215,7 @@ contract PhysicalRental is FunctionsClient, AutomationCompatibleInterface, ERC72
         tool.sended = true;
     }
 
-    event DebugToolCheck(address sender, address owner, address renter, toolstatus status);
-    event DebugArgs(string arg0, string arg1, string arg2);
-    event DebugRequestId(bytes32 requestId);
-    event DebugBeforeSendRequest();
-    event DebugAfterSendRequest(bytes32 requestId);
-    event DebugError(string reason);
-
     function receiveTool(uint256 toolId, bool actualWorked) external nonReentrant returns (bytes32 requestId){
-
-        Tool memory tool = s_tools[toolId];
-
-        emit DebugToolCheck(msg.sender, tool.owner, tool.renter, tool.status);
-
-        require(
-            tool.owner == msg.sender || tool.renter == msg.sender,
-            "No eres owner ni renter"
-        );
-
-        require(
-            tool.status == toolstatus.Sended || tool.status == toolstatus.Returned,
-            "Tool no esta en estado 'Sended' o 'Returned'"
-        );
-
-        require(i_subscriptionId != 0, "Falta subscription ID");
-        require(i_donId != bytes32(0), "DON ID no configurado");
-        require(i_gasLimit > 0, "Gas limit invalido");
-
-        emit DebugBeforeSendRequest();
-        
-        FunctionsRequest.Request memory req;
-        req.initializeRequestForInlineJavaScript(s_source);
-
-        string[] memory args = new string[](3);
-        args[0] = Strings.toString(toolId);
-        args[1] = actualWorked ? "1" : "0";
-        args[2] = tool.sendedWorked ? "1" : "0";
-
-        emit DebugArgs(args[0], args[1], args[2]);
-        req.setArgs(args);
-
-        requestId = _sendRequest(
-            req.encodeCBOR(),
-            i_subscriptionId,
-            i_gasLimit,
-            i_donId
-        );
-
-        emit DebugAfterSendRequest(requestId);
-
-        s_lastRequest.requestId = requestId;
-        s_lastRequest.toolId = toolId;
-        s_lastRequest.actualWorked = actualWorked;
-
-        return requestId;
-        /*
         Tool memory tool = s_tools[toolId];
         if(tool.owner != msg.sender && tool.renter != msg.sender){
             revert AccessNotPermited(msg.sender);
@@ -287,18 +235,18 @@ contract PhysicalRental is FunctionsClient, AutomationCompatibleInterface, ERC72
         req.setArgs(args); // Set the arguments for the request
 
         // Send the request and store the request ID
-        bytes32 arequestId = _sendRequest(
+        requestId = _sendRequest(
             req.encodeCBOR(),
             i_subscriptionId,
             i_gasLimit,
             i_donId
         );
 
-        s_lastRequest.requestId = arequestId;
+        s_lastRequest.requestId = requestId;
         s_lastRequest.toolId = toolId;
         s_lastRequest.actualWorked = actualWorked;
 
-        return s_lastRequest.requestId;*/
+        return requestId;
         
     }
 

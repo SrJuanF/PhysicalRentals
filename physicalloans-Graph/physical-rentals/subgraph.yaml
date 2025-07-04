@@ -8,9 +8,9 @@ dataSources:
     name: PhysicalRental
     network: fuji
     source:
-      address: "0xD979D8cC0034227d8eD3Bc7D994D11917463fF46"
+      address: "0xF70a99bc13bB9e0e972e991Fca0fC7f888Db85a1"
       abi: PhysicalRental
-      startBlock: 42847276
+      startBlock: 42996337
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -40,8 +40,22 @@ dataSources:
         - name: PhysicalRental
           file: ./abis/PhysicalRental.json
       eventHandlers:
+        - event: Approval(indexed address,indexed address,indexed uint256)
+          handler: handleApproval
+        - event: ApprovalForAll(indexed address,indexed address,bool)
+          handler: handleApprovalForAll
+        - event: BatchMetadataUpdate(uint256,uint256)
+          handler: handleBatchMetadataUpdate
+        - event: MetadataUpdate(uint256)
+          handler: handleMetadataUpdate
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
         - event: RelistToolAvailable(indexed uint256,indexed address,uint256,uint256,uint8,indexed uint8)
           handler: handleRelistToolAvailable
+        - event: RequestFulfilled(indexed bytes32)
+          handler: handleRequestFulfilled
+        - event: RequestSent(indexed bytes32)
+          handler: handleRequestSent
         - event: ToolDamageTransport(uint256)
           handler: handleToolDamageTransport
         - event: ToolDamaged(uint256)
@@ -60,6 +74,8 @@ dataSources:
           handler: handleToolReturned
         - event: ToolSended(indexed uint256,indexed uint8)
           handler: handleToolSended
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
         - event: errorResponseRecv(indexed bytes32,bytes)
           handler: handleerrorResponseRecv
         - event: reportUser(indexed address,uint256,bool)

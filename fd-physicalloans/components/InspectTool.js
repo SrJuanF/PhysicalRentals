@@ -34,33 +34,6 @@ const ToolActionModal = ({ isVisible, nftAddress, tokenId, status, role, onClose
     }
   }, [isWeb3Enabled, web3, account]);
 
-  const handleSuccess = () => {
-    dispatch({
-        type: "success",
-        message: "Tool successfully analyzed and registered",
-        title: "Success",
-        position: "topR",
-    })
-    handleClose();
-  }
-  const handleClose = () => {
-    onClose && onClose();
-    setLoading(false);
-    setResult(null);
-    setAttempts(0);
-    setResultsHistory([]);
-    setFinalResult(null);
-  }
-  const handleError = (error) => {
-    dispatch({
-      type: "error",
-      message: error || "Error in registryInspect",
-      title: "Error in registryInspect",
-      position: "topR",
-    })
-    console.error("Error in registryInspect:", error);
-  }
-
   const simulateAnalysis = () => {
     setLoading(true);
     setTimeout(() => {
@@ -89,7 +62,33 @@ const ToolActionModal = ({ isVisible, nftAddress, tokenId, status, role, onClose
   const handleRetry = () => {
     simulateAnalysis();
   };
-
+  
+  const handleSuccess = () => {
+    dispatch({
+        type: "success",
+        message: "Tool successfully analyzed and registered",
+        title: "Success",
+        position: "topR",
+    })
+    handleClose();
+  }
+  const handleClose = () => {
+    onClose && onClose();
+    setLoading(false);
+    setResult(null);
+    setAttempts(0);
+    setResultsHistory([]);
+    setFinalResult(null);
+  }
+  const handleError = (error) => {
+    dispatch({
+      type: "error",
+      message: error || "Error in registryInspect",
+      title: "Error in registryInspect",
+      position: "topR",
+    })
+    console.error("Error in registryInspect:", error);
+  }
   const STATUS_LABELS = {
     "Available": 0,
     "Requested": 1,

@@ -13,7 +13,7 @@ const networkConfig = {
         minMint: "150000000000000", // 0.00015 ETH 0.009
         router: "0xb83E47C2bC239B3bf370bc41e1459A34b41238D0",
         donId: "0x66756e2d657468657265756d2d7365706f6c69612d3100000000000000000000",
-        gasLimit: "700000", // 500,000 gas
+        gasLimit: "300000", // 300,000 gas
         subscriptionId: "5238",
     },
     43113: {
@@ -22,7 +22,7 @@ const networkConfig = {
         minMint: "150000000000000", // 0.00015 AVAX 1.5
         router: "0xA9d587a00A31A52Ed70D6026794a8FC5E2F5dCb0",
         donId: "0x66756e2d6176616c616e6368652d66756a692d31000000000000000000000000",
-        gasLimit: "700000", // 500,000 gas
+        gasLimit: "300000", // 300,000 gas
         subscriptionId: "15700",
     },
 }

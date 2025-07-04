@@ -1,6 +1,74 @@
-type ExampleEntity @entity(immutable: true) {
-  id: Bytes!
-  count: BigInt!
+type ActiveItem @entity(immutable: false){
+  id: ID!
+  toolId: BigInt! # uint256
   owner: Bytes! # address
-  approved: Bytes! # address
+  rentalPriceUSET: BigInt! # uint256
+  depositUsEt: BigInt! # uint256
+  renter: Bytes! # address
+  rentalDuration: BigInt! # uint256
+  status: Int! # uint8
+  condition: Int! #uint8
 }
+
+
+type ToolPenalized @entity(immutable: false){
+  id: ID!
+  toolId: BigInt! # uint256
+  renter: Bytes! # address
+}
+
+type ToolDamaged @entity(immutable: false){
+  id: ID!
+  toolId: BigInt! # uint256
+}
+
+type reportUser @entity(immutable: false){
+  id: ID!
+  twister: Bytes! # address
+  toolId: BigInt! # uint256
+  toolWorked: Boolean! # bool
+}
+
+type ToolDamageTransport @entity(immutable: false){
+  id: ID!
+  toolId: BigInt! # uint256
+}
+
+type errorResponseRecv @entity(immutable: false){
+  id: ID!
+  requestId: Bytes! # bytes
+  lastError: Bytes! # bytes
+}
+
+type DebugToolCheck @entity(immutable: false) {
+  id: ID! # bytes32
+  sender: Bytes! # address
+  owner: Bytes! # address
+  renter: Bytes! # address
+  status: Int! # uint8
+}
+type DebugArgs @entity(immutable: false) {
+  id: ID! # bytes32
+  arg0: String! # string
+  arg1: String! # string
+  arg2: String! # string
+}
+type DebugBeforeSendRequest @entity(immutable: false) {
+  id: ID! # bytes32
+  msg: String! # string
+}
+type DebugError @entity(immutable: false) {
+  id: ID! # bytes32
+  error: String! # string
+}
+type DebugRequestId @entity(immutable: false) { 
+  id: ID! # bytes32
+  requestId: Bytes! # bytes32
+}
+type DebugAfterSendRequest @entity(immutable: false) {
+  id: ID! # bytes32
+  requestId: Bytes! # bytes32
+}
+
+
+

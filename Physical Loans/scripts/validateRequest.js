@@ -4,6 +4,7 @@ const { ethers, getNamedAccounts } = hre
 async function main() {
     // deployer es account 2
     const { deployer, player } = await getNamedAccounts()
+
     console.log("Deployer:", deployer)
     console.log("User:", player)
 
@@ -11,21 +12,16 @@ async function main() {
     const signer = await ethers.getSigner(deployer)
     // 👉 Usa aquí la dirección antigua (la que ya tenía datos)
     const contractAddress = process.env.CONTRACT_ADDRESS
+
     // Conecta tu contrato en Fuji (sin redeploy, solo attach)
     const contract = await ethers.getContractAt("PhysicalRental", contractAddress, signer)
 
-    const toolId = 0n
-    const tool = await contract.getTool(toolId)
-    console.log("🧾 Datos del tool:")
-    console.log("- owner:", tool.owner)
-    console.log("- renter:", tool.renter)
-    console.log("- status:", tool.status.toString())
-    const signerAddress = await signer.getAddress()
-    console.log("🔐 Signer actual:", signerAddress)
-
     try {
+        // This is the line causing the error
+        const overrides = { value: ethers.parseEther("0.1074") };
+        console.log("Overrides object created successfully:", overrides); // Debug: Did we get here?
 
-        const tx = await contract.receiveTool(toolId, true);
+        const tx = await contract.rentTool(0n, 86400n, overrides);
         const result = await tx.wait();
         console.log("✅ Transacción confirmada");
         console.log("✅ Transacción confirmada. Bloque:", result.blockNumber);
@@ -86,70 +82,3 @@ main().catch((error) => {
     console.error("❌ Error en el script:", error)
     process.exit(1)
 })
-
-
-/*event DebugToolCheck(address sender, address owner, address renter, toolstatus status);
-    event DebugArgs(string arg0, string arg1, string arg2);
-    event DebugRequestId(bytes32 requestId);
-    event DebugBeforeSendRequest(string msg);
-    event DebugAfterSendRequest(bytes32 requestId);
-    event DebugError(string reason);
-    event confFunctions(uint64 subscriptionId, bytes32 donId, uint32 gasLimit, string source);
-
-    event ChainlinkRequestFailed( uint256 toolId, string errorMessage, bytes errorData);
-    event RequestRevertedWithErrorMsg( string reason);
-    event RequestRevertedWithoutErrorMsg( bytes data);
-
-
-    function receiveTool(uint256 toolId, bool actualWorked) external nonReentrant returns (bytes32 requestId){
-        // ... Your initial validations (owner/renter, tool status) ...
-        emit DebugToolCheck(msg.sender, s_tools[toolId].owner, s_tools[toolId].renter, s_tools[toolId].status);
-        Tool memory tool = s_tools[toolId];
-        require(
-            tool.owner == msg.sender || tool.renter == msg.sender,
-            "No eres owner ni renter"
-        );
-
-        require(
-            tool.status == toolstatus.Sended || tool.status == toolstatus.Returned,
-            "Tool no esta en estado 'Sended' o 'Returned'"
-        );
-
-        // Your Chainlink Functions validations
-        require(i_subscriptionId != 0, "Falta subscription ID");
-        require(i_donId != bytes32(0), "DON ID no configurado");
-        require(i_gasLimit > 0, "Gas limit invalido");
-
-
-        // --- END OF REVISED LOGS ---
-
-        emit DebugBeforeSendRequest("Antes de enviar la solicitud");
-
-        FunctionsRequest.Request memory req;
-        req.initializeRequestForInlineJavaScript(s_source);
-
-        string[] memory args = new string[](3);
-        // Strings.toString() is still correct for uint256 if you're using it for args
-        // but if `Strings.sol` import is removed, ensure you don't need it for `args[0]`
-        args[0] = Strings.toString(toolId); // Keep this if Strings.sol is imported for other reasons
-        args[1] = actualWorked ? "1" : "0";
-        args[2] = tool.sendedWorked ? "1" : "0";
-
-        emit DebugArgs(args[0], args[1], args[2]);
-        req.setArgs(args);
-
-        requestId = _sendRequest(
-            req.encodeCBOR(),
-            i_subscriptionId,
-            i_gasLimit,
-            i_donId
-        );
-    
-        emit DebugAfterSendRequest(requestId);
-
-        s_lastRequest.requestId = requestId;
-        s_lastRequest.toolId = toolId;
-        s_lastRequest.actualWorked = actualWorked;
-
-        return requestId;
-    }*/
