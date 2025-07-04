@@ -213,7 +213,7 @@ contract PhysicalRental is FunctionsClient, AutomationCompatibleInterface, ERC72
         tool.sended = true;
     }
 
-    event DebugToolCheck(address sender, address owner, address renter, uint8 status);
+    event DebugToolCheck(address sender, address owner, address renter, toolstatus status);
     event DebugArgs(string arg0, string arg1, string arg2);
     event DebugRequestId(bytes32 requestId);
     event DebugBeforeSendRequest();
@@ -224,24 +224,24 @@ contract PhysicalRental is FunctionsClient, AutomationCompatibleInterface, ERC72
 
         Tool memory tool = s_tools[toolId];
 
-        emit DebugToolCheck(msg.sender, tool.owner, tool.renter, uint8(tool.status));
+        emit DebugToolCheck(msg.sender, tool.owner, tool.renter, tool.status);
 
-        if (tool.owner != msg.sender && tool.renter != msg.sender) {
-            revert AccessNotPermited(msg.sender);
-        }
+        require(
+            tool.owner == msg.sender || tool.renter == msg.sender,
+            "No eres owner ni renter"
+        );
 
-        if (tool.status != toolstatus.Sended && tool.status != toolstatus.Returned) {
-            revert toolNotSended();
-        }
+        require(
+            tool.status == toolstatus.Sended || tool.status == toolstatus.Returned,
+            "Tool no esta en estado 'Sended' o 'Returned'"
+        );
 
-        // ✅ Verifica configuración de Chainlink
-        require(i_subscriptionId != 0, "Missing subscription ID");
-        require(i_donId != bytes32(0), "DON ID not set");
-        require(i_gasLimit > 0, "Gas limit must be greater than 0");
+        require(i_subscriptionId != 0, "Falta subscription ID");
+        require(i_donId != bytes32(0), "DON ID no configurado");
+        require(i_gasLimit > 0, "Gas limit invalido");
 
         emit DebugBeforeSendRequest();
-
-        // ********** VERIFICAR CON FUNCTIONS ************************
+        
         FunctionsRequest.Request memory req;
         req.initializeRequestForInlineJavaScript(s_source);
 
@@ -249,12 +249,11 @@ contract PhysicalRental is FunctionsClient, AutomationCompatibleInterface, ERC72
         args[0] = Strings.toString(toolId);
         args[1] = actualWorked ? "1" : "0";
         args[2] = tool.sendedWorked ? "1" : "0";
-        
+
         emit DebugArgs(args[0], args[1], args[2]);
         req.setArgs(args);
 
-        // Send the request and store the request ID
-        bytes32 requestId = _sendRequest(
+        requestId = _sendRequest(
             req.encodeCBOR(),
             i_subscriptionId,
             i_gasLimit,

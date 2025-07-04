@@ -309,11 +309,6 @@
     "type": "error"
   },
   {
-    "inputs": [],
-    "name": "toolNotSended",
-    "type": "error"
-  },
-  {
     "inputs": [
       {
         "internalType": "address",
@@ -491,7 +486,7 @@
       },
       {
         "indexed": false,
-        "internalType": "uint8",
+        "internalType": "enum PhysicalRental.toolstatus",
         "name": "status",
         "type": "uint8"
       }

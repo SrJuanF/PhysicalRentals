@@ -113,7 +113,7 @@ const ToolActionModal = ({ isVisible, nftAddress, tokenId, status, role, onClose
           send
         )
         const receipt = await tx.wait()
-        //console.log("Transaction confirmed:", receipt)
+        console.log("Transaction confirmed:", receipt)
         handleSuccess()
       } catch (error) {
         console.error("Error sending tool:", error)
@@ -146,11 +146,78 @@ const ToolActionModal = ({ isVisible, nftAddress, tokenId, status, role, onClose
           receive
         )
         const receipt = await tx.wait()
-        //console.log("Transaction confirmed:", receipt)
+        console.log("Transaction confirmed:", receipt)
         handleSuccess()
       } catch (error) {
-        console.error("Error sending tool:", error)
-        dispatch({ type: "error", message: error.message || String(error), title: "Transaction Failed", position: "topR",})
+        //console.error("Error sending tool:", error)
+        //dispatch({ type: "error", message: error.message || String(error), title: "Transaction Failed", position: "topR",})
+        console.error("Transaction failed!");
+        console.error("Error details:", error);
+
+        // --- IMPORTANT: How to get more precise error details ---
+
+        // 1. Check for 'error.reason' or 'error.data.message' (Ethers v5)
+        //    This often contains the string passed to require() or the custom error name.
+        if (error.reason) {
+            console.error("Revert reason (error.reason):", error.reason);
+        } else if (error.data && error.data.message) {
+            // For older Ethers versions or specific RPC errors
+            console.error("Revert reason (error.data.message):", error.data.message);
+        } else if (error.message) {
+            // Generic error message from MetaMask/RPC
+            console.error("Error message (error.message):", error.message);
+        }
+
+        // 2. Check for custom errors (Ethers v6+)
+        //    Ethers v6 provides a more structured way to decode custom errors.
+        //    You might need to enable error decoding on your contract instance.
+        if (error.code === 'CALL_EXCEPTION' && error.data) {
+            try {
+                // Assuming `contract.interface` is available and has the ABI
+                const decodedError = contract.interface.parseError(error.data);
+                if (decodedError) {
+                    console.error("Decoded Custom Error Name:", decodedError.name);
+                    console.error("Decoded Custom Error Args:", decodedError.args);
+
+                    // Check for your specific custom errors
+                    if (decodedError.name === "AccessNotPermited") {
+                        console.error("AccessNotPermited Error: Sender:", decodedError.args[0]);
+                    } else if (decodedError.name === "toolNotSended") {
+                        console.error("Tool Not Sended Error occurred.");
+                    }
+                }
+            } catch (decodeError) {
+                console.warn("Could not decode custom error from data:", decodeError);
+                console.error("Raw error data:", error.data); // Log raw data if decoding fails
+            }
+        } else if (error.code === 'UNPREDICTABLE_GAS_LIMIT' || error.code === 'TRANSACTION_REPLACED') {
+            // These codes often indicate that the transaction would revert.
+            // Check the nested error for the actual revert reason.
+            if (error.receipt && error.receipt.status === 0) {
+                console.error("Transaction reverted on-chain (status 0 in receipt).");
+                console.error("Receipt:", error.receipt);
+            }
+            if (error.error && error.error.data) {
+                 // For errors like "execution reverted" that come wrapped
+                 console.error("Nested error data:", error.error.data);
+            }
+        }
+
+
+        // 3. For the "MetaMask - RPC Error: Internal JSON-RPC error."
+        //    The `error.data` field is crucial here, as it contains the nested 'execution reverted' message.
+        if (error.data && error.data.code && error.data.message) {
+            console.error("Nested RPC Error Code:", error.data.code);
+            console.error("Nested RPC Error Message:", error.data.message);
+            if (error.data.data) { // This is the '0x...' revert data
+                console.error("Nested RPC Error Data (Revert Hex):", error.data.data);
+            }
+        }
+
+        // If you're on a local development network (like Hardhat Network),
+        // you might get very detailed revert reasons directly.
+
+        throw error; // Re-throw the error if you want calling code to handle it
       }
     }
     //onComplete(finalResult);

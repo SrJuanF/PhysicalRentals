@@ -35,8 +35,10 @@ module.exports.tags = ["all", "physicalRentals"]
 
 //Fuji = https://testnet.snowtrace.io/address/0xD979D8cC0034227d8eD3Bc7D994D11917463fF46
 
-//
-//Sepolia = 0x47f00852F931F5f78249C921eB2B0f4af057a0D1
+//0x0544a4cC6bBf9C0Bf9efAe163E207741F2fDb159
+//Sepolia = 
+
+//https://api.studio.thegraph.com/query/114947/physical-rentals/v0.0.1
 
 const source = `
 const toolId = Number(args[0]);
