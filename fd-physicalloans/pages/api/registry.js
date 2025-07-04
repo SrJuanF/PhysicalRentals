@@ -9,14 +9,7 @@ const supabase = createClient(
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end("Only POST allowed")
 
-  const {
-    address,         // Dirección pública del "creador" de la app
-    toolId,
-    condition,
-    status,
-    send,
-    receive
-  } = req.body
+  const { address, toolId, status, send, receive} = req.body
 
   // Validar dirección del creador de la app
   if (address.toLowerCase() !== process.env.NEXT_PUBLIC_APP_CREATOR_ADDRESS.toLowerCase()) {
@@ -37,17 +30,24 @@ export default async function handler(req, res) {
 
   let result
   if (existing) {
-    // Actualizar herramienta
+    const updateFields = {}
+    if (send !== null && send !== undefined) updateFields.conditionSended = send
+    if (receive !== null && receive !== undefined) updateFields.conditionReceive = receive
+
     result = await supabase
       .from("inspects")
-      .update({ condition, status, send, receive })
+      .update(updateFields)
       .eq("id", toolId)
   } else {
-    // Crear nueva herramienta
     let id = toolId
     result = await supabase
       .from("inspects")
-      .insert([{ id, condition, status, send, receive }])
+      .insert([{
+        id,
+        status,
+        conditionSended: send,
+        conditionReceive: receive
+      }])
   }
 
   if (result.error) return res.status(400).json({ error: result.error.message })

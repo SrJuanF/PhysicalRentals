@@ -69,8 +69,15 @@
 /* status 1 → Requested → Marrón */
 .status-requested {
   color: #ffffff;
+  background-color: #4f46e5; /* Tailwind: indigo-600 */
+  
+}
+
+.status-sended{
+  color: #ffffff;
   background-color: #8b4513; /* Marrón */
 }
+
 
 /* status 2 → Rented → Amarillo */
 .status-rented {

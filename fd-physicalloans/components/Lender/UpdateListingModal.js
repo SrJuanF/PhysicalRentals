@@ -40,6 +40,9 @@ export default function UpdateListingModal({ nftAddress, tokenId, isVisible, onC
             title: "Tool updated",
             position: "topR",
         })
+        handleClose
+    }
+    const handleClose = () => {
         onClose && onClose()
         setNewPriceUSD("")
         setNewDepositUSD("")
@@ -101,8 +104,8 @@ export default function UpdateListingModal({ nftAddress, tokenId, isVisible, onC
         <Modal
             title={"Tool Update"}
             isVisible={isVisible}
-            onCancel={onClose}
-            onCloseButtonPressed={onClose}
+            onCancel={handleClose}
+            onCloseButtonPressed={handleClose}
             onOk={handleSubmit}
             isCentered={true}
             canOverflow={true}

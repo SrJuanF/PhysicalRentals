@@ -75,6 +75,9 @@ export default function RentToolModal({ isVisible, tokenId, nftAddress, rentalPr
             title: "Success",
             position: "topR",
         })
+        handleClose()
+    }
+    const handleClose = () => {
         onClose && onClose()
         setRentalDays("")
         setEthToSend("")
@@ -126,8 +129,8 @@ export default function RentToolModal({ isVisible, tokenId, nftAddress, rentalPr
         <Modal
             title={"Rent the tool"}
             isVisible={isVisible}
-            onCancel={onClose}
-            onCloseButtonPressed={onClose}
+            onCancel={handleClose}
+            onCloseButtonPressed={handleClose}
             onOk={handleSubmit}
             isCentered={true}
             canOverflow={true}

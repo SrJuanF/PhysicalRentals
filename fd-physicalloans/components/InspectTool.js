@@ -1,36 +1,39 @@
-import { Modal, Input, useNotification } from "web3uikit"
-import { useWeb3Contract } from "react-moralis"
+import { useNotification } from "web3uikit"
+import { useMoralis } from "react-moralis"
 import PhysicalRental from "@/constants/PhysicalRental.json"
 import { ethers } from "ethers"
 import React, { useState, useEffect } from 'react';
 import { Loader2, X } from 'lucide-react';
 
-
 const ToolActionModal = ({ isVisible, nftAddress, tokenId, status, role, onClose}) => {
+  const dispatch = useNotification()
   const [loading, setLoading] = useState(true);
   const [result, setResult] = useState(null); // resultado del intento actual
   const [attempts, setAttempts] = useState(0);
   const [resultsHistory, setResultsHistory] = useState([]);
   const [finalResult, setFinalResult] = useState(null); // 'Work' o 'No Work'
 
-  const { runContractFunction: sendTool } = useWeb3Contract({ // Owner or Renter?
-    abi: PhysicalRental,
-    contractAddress: nftAddress,
-    functionName: "sendTool",
-    params: {
-      toolId: ethers.BigNumber.from(tokenId.toString()),
-      actualWorked: true,
-    },
-  });
-  const { runContractFunction: receiveTool } = useWeb3Contract({ //Owner or Renter?
-    abi: PhysicalRental,
-    contractAddress: nftAddress,
-    functionName: "receiveTool",
-    params: {
-        toolId: ethers.BigNumber.from(tokenId.toString()),
-        actualWorked: true,
-    },
-  });
+  const { isWeb3Enabled, account, web3 } = useMoralis()
+  const [contract, setEtherContract] = useState(null)
+
+  useEffect(() => {
+    if (isWeb3Enabled && web3.provider && account) {
+        try {
+          const provider = new ethers.providers.Web3Provider(web3.provider);
+          const signer = provider.getSigner();
+          const contractEthers = new ethers.Contract(nftAddress, PhysicalRental, signer);
+          setEtherContract(contractEthers);
+          console.log("Contract created and set in useEffect.");
+        } catch (error) {
+          console.error("Error creating contract:", error);
+          setEtherContract(null); // Set to null if an error occurs
+        }
+    } else {
+      console.log("Conditions not met for contract creation. Setting contract to null.");
+      setEtherContract(null);
+    }
+  }, [isWeb3Enabled, web3, account]);
+
   const handleSuccess = () => {
     dispatch({
         type: "success",
@@ -38,12 +41,24 @@ const ToolActionModal = ({ isVisible, nftAddress, tokenId, status, role, onClose
         title: "Success",
         position: "topR",
     })
-    onClose && onClose()
-    setLoading(true);
+    handleClose();
+  }
+  const handleClose = () => {
+    onClose && onClose();
+    setLoading(false);
     setResult(null);
     setAttempts(0);
     setResultsHistory([]);
     setFinalResult(null);
+  }
+  const handleError = (error) => {
+    dispatch({
+      type: "error",
+      message: error || "Error in registryInspect",
+      title: "Error in registryInspect",
+      position: "topR",
+    })
+    console.error("Error in registryInspect:", error);
   }
 
   const simulateAnalysis = () => {
@@ -66,42 +81,92 @@ const ToolActionModal = ({ isVisible, nftAddress, tokenId, status, role, onClose
       } else if (countMala === 2) {
         setFinalResult('No Work');
       }
-    }, 2000);
+    }, 3000);
   };
   useEffect(() => {
     simulateAnalysis();
-  }, []);
+  }, [isVisible]);
   const handleRetry = () => {
     simulateAnalysis();
   };
 
-  const handleProceed = () => {
+  const STATUS_LABELS = {
+    "Available": 0,
+    "Requested": 1,
+    "Sended": 2,
+    "Rented": 3,
+    "Returned": 4,
+    "Inspected": 5,
+  }
+  const handleProceed = async () => {
+
     if ((role === 'Owner' && status === 'Requested') || (role === 'Renter' && status === 'Rented')) {
-      sendTool({
-        onSuccess: handleSuccess,
-        onError: (error) => console.error("Error sending tool:", error),
-      });
+      try {
+        const send = finalResult === 'Work' ? true : false;
+        const result = await registryInspect(tokenId, STATUS_LABELS[status], send, null); // validar receive
+        if(result?.error) {
+          handleError(result.error);
+          return;
+        }
+        const tx = await contract.sendTool(
+          ethers.BigNumber.from(tokenId.toString()),
+          send
+        )
+        const receipt = await tx.wait()
+        //console.log("Transaction confirmed:", receipt)
+        handleSuccess()
+      } catch (error) {
+        console.error("Error sending tool:", error)
+        dispatch({ type: "error", message: error.message || String(error), title: "Transaction Failed", position: "topR",})
+      }
     } else if ((role === 'Owner' && status === 'Returned') || (role === 'Renter' && status === 'Sended')) {
-      receiveTool({
-        onSuccess: handleSuccess,
-        onError: (error) => console.error("Error receiving tool:", error),
-      });
+      try {
+        const receive = finalResult === 'Work' ? true : false;
+        const result = await registryInspect(tokenId, STATUS_LABELS[status], null, receive); // validar send
+        if(result?.error) {
+          handleError(result.error);
+          return;
+        }
+        console.log("Tool ID: ", tokenId.toString())
+        const tool = await contract.getTool(ethers.BigNumber.from(tokenId.toString()))
+        const minMint = await contract.getMinMint()
+        console.log("Estado actual del tool:", tool.status)
+        console.log("Cuenta conectada:", account)
+        console.log("Owner:", tool.owner)
+        console.log("Renter:", tool.renter)
+        console.log("Min Mint:", minMint.toString())
+
+        console.log("Sender autorizado:", 
+          account.toLowerCase() === tool.owner.toLowerCase() || 
+          account.toLowerCase() === tool.renter.toLowerCase()
+        )
+
+        const tx = await contract.receiveTool(
+          ethers.BigNumber.from(tokenId.toString()),
+          receive
+        )
+        const receipt = await tx.wait()
+        //console.log("Transaction confirmed:", receipt)
+        handleSuccess()
+      } catch (error) {
+        console.error("Error sending tool:", error)
+        dispatch({ type: "error", message: error.message || String(error), title: "Transaction Failed", position: "topR",})
+      }
     }
     //onComplete(finalResult);
   };
 
-  const shouldRetry =
-    !finalResult && attempts < 3;
+  const shouldRetry = !finalResult && attempts < 3;
 
   const canProceed =
     finalResult === 'Work' ||
     (role !== 'Owner' || status !== 'Requested'); // owner-Send necesita buena
 
   return (
-    <div className="modal-overlay" style={{ display: isVisible ? 'block' : 'none' }}>
+    <div className="modal-overlay" style={{ display: isVisible ? 'flex' : 'none' }}>
       <div className="modal">
 
-        <button className="modal-close-btn" onClick={onClose} aria-label="Cerrar modal">
+        <button className="modal-close-btn" onClick={handleClose} aria-label="Cerrar modal">
           <X className="modal-close-icon" />
         </button>
 
@@ -151,22 +216,19 @@ const ToolActionModal = ({ isVisible, nftAddress, tokenId, status, role, onClose
   );
 }
 
-export default ToolActionModal;
-
-
-
-
-async function registryInspect(){
+async function registryInspect(toolId, status, send, receive) {
     // desde el cliente
-    await fetch('/api/create-tool', {
+    await fetch('/api/registry', {
         method: 'POST',
         body: JSON.stringify({
-            tool_id: 101,
-            condition: "buena",
-            status: "activa",
-            send: "2025-06-25T10:00:00Z",
-            receive: "2025-06-25T16:00:00Z"
+            address: process.env.NEXT_PUBLIC_APP_CREATOR_ADDRESS,
+            toolId: toolId,
+            status: status,
+            send: send,
+            receive: receive
         }),
         headers: { 'Content-Type': 'application/json' }
     })
 }
+
+export default ToolActionModal;

@@ -81,10 +81,8 @@ export default function NFTBox({ nftAddress, tokenId, Owner, rentalPriceUSET, de
 
     const isRenterByUser = renter.toLocaleLowerCase() == account.toLocaleLowerCase()
 
-    console.log(STATUS_LABELS[status])
-    console.log(rentalPriceUSET)
-    
-
+    //console.log(STATUS_LABELS[status])
+    //console.log(rentalPriceUSET)
     const handleCardClick = () => {
         if (isOwnedByUser) {
             if (STATUS_LABELS[status] == "Available" || STATUS_LABELS[status] == "Inspected") { //****** STUTS SENDEEED */

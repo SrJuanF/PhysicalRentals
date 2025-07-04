@@ -34,7 +34,9 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 module.exports.tags = ["all", "physicalRentals"]
 
 //Fuji = https://testnet.snowtrace.io/address/0xD979D8cC0034227d8eD3Bc7D994D11917463fF46
-//Sepolia = 
+
+//
+//Sepolia = 0x47f00852F931F5f78249C921eB2B0f4af057a0D1
 
 const source = `
 const toolId = Number(args[0]);
