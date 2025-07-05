@@ -208,6 +208,7 @@ const ToolActionModal = ({ isVisible, nftAddress, tokenId, status, role, onClose
 
 async function registryInspect(toolId, status, send, receive) {
     // desde el cliente
+    console.log(process.env.NEXT_PUBLIC_APP_CREATOR_ADDRESS, toolId, status, send, receive);
     const result = await fetch('/api/registry', {
         method: 'POST',
         body: JSON.stringify({
@@ -219,7 +220,9 @@ async function registryInspect(toolId, status, send, receive) {
         }),
         headers: { 'Content-Type': 'application/json' }
     })
-    return await result.json();
+    const data = await result.json();
+    console.log(data)
+    return data;
 }
 
 export default ToolActionModal;
