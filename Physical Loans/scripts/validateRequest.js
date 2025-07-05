@@ -17,11 +17,13 @@ async function main() {
     const contract = await ethers.getContractAt("PhysicalRental", contractAddress, signer)
 
     try {
+        const tokenID = 0n; // ID del tool que quieres rentar
+        const durationSeg = 86400n; // Duración del alquiler en segundos (1 día)
         // This is the line causing the error
         const overrides = { value: ethers.parseEther("0.1074") };
         console.log("Overrides object created successfully:", overrides); // Debug: Did we get here?
 
-        const tx = await contract.rentTool(0n, 86400n, overrides);
+        const tx = await contract.rentTool(tokenID, durationSeg, overrides);
         const result = await tx.wait();
         console.log("✅ Transacción confirmada");
         console.log("✅ Transacción confirmada. Bloque:", result.blockNumber);

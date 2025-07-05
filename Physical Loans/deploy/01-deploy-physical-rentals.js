@@ -37,7 +37,19 @@ module.exports.tags = ["all", "physicalRentals"]
 
 //Sepolia = 
 
-//https://api.studio.thegraph.com/query/114947/physical-rentals/v0.0.1
+/*
+git add .
+rm -rf physicalloans-Graph/physical-rentals/.git
+git rm --cached -rf physicalloans-Graph/physical-rentals
+rm -rf fd-physicalloans/.git
+git rm --cached -rf fd-physicalloans
+git add physicalloans-Graph/physical-rentals
+git add fd-physicalloans
+git commit -m "deploy physical rentals"
+git pushh // origin main
+*/
+
+
 
 const source = `
 const toolId = Number(args[0]);

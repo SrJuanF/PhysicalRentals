@@ -4,52 +4,38 @@ const { ethers, getNamedAccounts } = hre
 async function main() {
     // deployer es account 2
     const { deployer, player } = await getNamedAccounts()
-
     console.log("Deployer:", deployer)
     console.log("User:", player)
 
     // Conectar manualmente con la address del deployer
-    const signer = await ethers.getSigner(player)
+    const signer = await ethers.getSigner(deployer)
     // 👉 Usa aquí la dirección antigua (la que ya tenía datos)
     const contractAddress = process.env.CONTRACT_ADDRESS
-
     // Conecta tu contrato en Fuji (sin redeploy, solo attach)
     const contract = await ethers.getContractAt("PhysicalRental", contractAddress, signer)
 
     try {
-        const tokenID = 0n; 
-        const conditionSendedUser = true;
-        const tx = await contract.sendTool(tokenID, conditionSendedUser);
-        const result = await tx.wait();
-        console.log("✅ Transacción confirmada");
-        console.log("✅ Transacción confirmada. Bloque:", result.blockNumber);
-        console.log("Gas usado:", result.gasUsed.toString());
-        // --- Accediendo a los Logs/Eventos ---
-        if (result.logs) {
-            console.log("📄 Logs de la transacción:");
-            result.logs.forEach((log, index) => {
-                try {
-                    // Intenta parsear el log usando la interfaz de tu contrato
-                    const parsedLog = contract.interface.parseLog(log);
-                    if (parsedLog) {
-                        console.log(`  Log ${index + 1}:`);
-                        console.log(`    Nombre del Evento: ${parsedLog.name}`);
-                        console.log(`    Argumentos:`);
-                        // Itera sobre los argumentos del evento para mostrarlos
-                        parsedLog.args.forEach((arg, i) => {
-                            console.log(`      ${parsedLog.fragment.inputs[i].name || `Arg${i}`}: ${arg.toString()}`);
-                        });
-                    } else {
-                        console.log(`  Log ${index + 1}: No se pudo parsear (posiblemente no es un evento de este contrato).`, log);
-                    }
-                } catch (parseError) {
-                    console.error(`  Error al parsear el log ${index + 1}:`, parseError.message);
-                    console.log("  Log raw:", log);
-                }
-            });
-        } else {
-            console.log("No se encontraron logs en esta transacción.");
-        }
+        const toolId = 0n
+        const tool = await contract.getTool(toolId)
+        console.log("🧾 Datos del tool:")
+        console.log("- owner:", tool.owner)
+        console.log("- renter:", tool.renter)
+        console.log("- rentalDuration:", tool.rentalDuration)
+        console.log("- status:", tool.status.toString())
+        const signerAddress = await signer.getAddress()
+        console.log("🔐 Signer actual:", signerAddress)
+
+        const activeRental = await contract.getActiveRental(toolId);
+        
+        console.log("✅ Renta Activa - renter:", activeRental.renter);
+        console.log("✅ Renta Activa - endTime:", activeRental.rentalEnd);
+
+
+        const lineNear = await contract.getRentalNearLine();
+        console.log("✅ Línea de Alquiler Cercana - renter:", lineNear);
+        const date = new Date(Number(lineNear) * 1000); // Se multiplica por 1000 porque Date espera milisegundos
+        console.log("Fecha LineNear: ", date.toString());
+        
     } catch (error) {
         console.error("❌ La transacción falló:");
         console.error(error);

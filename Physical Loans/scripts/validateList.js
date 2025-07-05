@@ -27,14 +27,14 @@ async function main() {
     const contract = await ethers.getContractAt("PhysicalRental", contractAddress, signer);
 
     const URIONE = "https://crimson-certain-parrotfish-735.mypinata.cloud/ipfs/QmXzCM5eHHGHBiKRdbZmnm4SjsBupvXypKcKLuoSK5vcTY";
-    const URITWO = "https://crimson-certain-parrotfish-735.mypinata.cloud/ipfs/QmW78DNz78JB23M79mgCG68GtMHEXQy9MD71GeTcS3aCoF"; // Still here, but not used
-    const URITHREE = "https://crimson-certain-parrotfish-735.mypinata.cloud/ipfs/QmSDMDvjpf77S1pKQruWRhrrbgceUo6hAPu891sknihW8j";
+    const URITWO = "https://crimson-certain-parrotfish-735.mypinata.cloud/ipfs/QmSDMDvjpf77S1pKQruWRhrrbgceUo6hAPu891sknihW8j"; // Taladro
+    const URITHREE = "https://crimson-certain-parrotfish-735.mypinata.cloud/ipfs/QmW78DNz78JB23M79mgCG68GtMHEXQy9MD71GeTcS3aCoF"; 
     try {
         // This is the line causing the error
         const overrides = { value: ethers.parseEther("0.0002") };
         console.log("Overrides object created successfully:", overrides); // Debug: Did we get here?
 
-        const tx = await contract.listTool(URITWO, 1n, 1n, 1, overrides);
+        const tx = await contract.listTool(URITHREE, 1n, 1n, 1, overrides);
         const result = await tx.wait();
         console.log("✅ Transacción confirmada");
         console.log("✅ Transacción confirmada. Bloque:", result.blockNumber);

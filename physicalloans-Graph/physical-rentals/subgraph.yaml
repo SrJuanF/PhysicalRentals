@@ -40,22 +40,8 @@ dataSources:
         - name: PhysicalRental
           file: ./abis/PhysicalRental.json
       eventHandlers:
-        - event: Approval(indexed address,indexed address,indexed uint256)
-          handler: handleApproval
-        - event: ApprovalForAll(indexed address,indexed address,bool)
-          handler: handleApprovalForAll
-        - event: BatchMetadataUpdate(uint256,uint256)
-          handler: handleBatchMetadataUpdate
-        - event: MetadataUpdate(uint256)
-          handler: handleMetadataUpdate
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
         - event: RelistToolAvailable(indexed uint256,indexed address,uint256,uint256,uint8,indexed uint8)
           handler: handleRelistToolAvailable
-        - event: RequestFulfilled(indexed bytes32)
-          handler: handleRequestFulfilled
-        - event: RequestSent(indexed bytes32)
-          handler: handleRequestSent
         - event: ToolDamageTransport(uint256)
           handler: handleToolDamageTransport
         - event: ToolDamaged(uint256)
@@ -74,8 +60,6 @@ dataSources:
           handler: handleToolReturned
         - event: ToolSended(indexed uint256,indexed uint8)
           handler: handleToolSended
-        - event: Transfer(indexed address,indexed address,indexed uint256)
-          handler: handleTransfer
         - event: errorResponseRecv(indexed bytes32,bytes)
           handler: handleerrorResponseRecv
         - event: reportUser(indexed address,uint256,bool)
