@@ -49,14 +49,12 @@ git commit -m "deploy physical rentals"
 git push // origin main
 */
 
-
-
 const source = `
 const toolId = Number(args[0]);
 const conditionReceiveUser = Number(args[1]);
 const conditionSendedUser = Number(args[2]);
 const SUPABASE_URL = "https://momeenlweghtwdfqsyin.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1vbWVlbmx3ZWdodHdkZnFzeWluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTExNjA2MzIsImV4cCI6MjA2NjczNjYzMn0.miwb8JT8QXAhy5gcsnB9hbbQK5KNOUTxoyW4_D01llc";
+const SUPABASE_ANON_KEY = ${process.env.SUPABASE_ANON_KEY};
 const response = await Functions.makeHttpRequest({
   url: \`\${SUPABASE_URL}/rest/v1/inspects?id=eq.\${toolId}\`,
   method: "GET",
@@ -88,11 +86,5 @@ return Functions.encodeUint256(value);
 https://github.com/ciaranightingale/chainlink-fundamentals-code/blob/main/automation/CustomLogic.sol
 https://github.com/ciaranightingale/chainlink-fundamentals-code/blob/main/functions/FunctionsConsumer.sol
 https://functions.chain.link/playground
-
-
-NftMarketplace.sol
-RandomIpfsNft.sol
-03-deploy-random-ipfs-nft.js
-
 */
 
