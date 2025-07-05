@@ -46,7 +46,7 @@ git rm --cached -rf fd-physicalloans
 git add physicalloans-Graph/physical-rentals
 git add fd-physicalloans
 git commit -m "deploy physical rentals"
-git pushh // origin main
+git push // origin main
 */
 
 

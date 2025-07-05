@@ -2,6 +2,11 @@
 
 This decentralized application (dApp) enables users to **lend or rent physical tools** in a secure and trustless environment using blockchain, automated services, and off-chain validation.
 
+# Physical Loans dApp
+
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Online-green?style=for-the-badge)](https://physical-rentals.vercel.app/)
+
+
 ## 🔧 Technologies Used
 
 - [Hardhat](https://hardhat.org/) – Smart contract development environment  
