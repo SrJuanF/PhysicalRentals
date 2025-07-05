@@ -15,7 +15,7 @@ async function main() {
     const contract = await ethers.getContractAt("PhysicalRental", contractAddress, signer)
 
     try {
-        const toolId = 0n
+        const toolId = 3n
         const tool = await contract.getTool(toolId)
         console.log("🧾 Datos del tool:")
         console.log("- owner:", tool.owner)

@@ -7,7 +7,7 @@ const supabase = createClient(
 )
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).end("Only POST allowed")
+  if (req.method !== 'POST') return res.status(405).json({ error: "Method not allowed" })
 
   const { address, toolId, status, send, receive} = req.body
 
