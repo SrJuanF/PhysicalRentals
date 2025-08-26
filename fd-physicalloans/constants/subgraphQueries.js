@@ -1,18 +1,18 @@
-import { gql } from "@apollo/client"
+import { gql } from "@apollo/client";
 
 const GET_ACTIVE_ITEMS = gql`
-    {
-        activeItems(first: 5) {
-            id
-            toolId
-            owner
-            rentalPriceUSET
-            depositUsEt
-            renter
-            rentalDuration
-            status
-            condition
-        }
+  {
+    activeItems(first: 5) {
+      id
+      toolId
+      owner
+      rentalPriceUSET
+      depositUsEt
+      renter
+      rentalDuration
+      status
+      condition
     }
-`
-export default GET_ACTIVE_ITEMS
+  }
+`;
+export default GET_ACTIVE_ITEMS;

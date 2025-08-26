@@ -14,7 +14,7 @@ This decentralized application (dApp) enables users to **lend or rent physical t
 - [OpenZeppelin](https://openzeppelin.com/contracts/) – Security-focused contract library  
 - [Chainlink](https://chain.link/) – Automation & off-chain data integration  
 - [Next.js](https://nextjs.org/) – Frontend framework  
-- [Moralis](https://moralis.io/) – Web3 wallet integration & authentication  
+- [rainbowkit](https://rainbowkit.com/) – Web3 wallet integration & authentication  
 - [The Graph](https://thegraph.com/) – Blockchain data indexing  
 - [Supabase](https://supabase.io/) – Realtime database & backend  
 

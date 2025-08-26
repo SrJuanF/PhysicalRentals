@@ -38,15 +38,18 @@ module.exports.tags = ["all", "physicalRentals"]
 //Sepolia = 
 
 /*
-git add .
-rm -rf physicalloans-Graph/physical-rentals/.git
-git rm --cached -rf physicalloans-Graph/physical-rentals
-rm -rf fd-physicalloans/.git
-git rm --cached -rf fd-physicalloans
-git add physicalloans-Graph/physical-rentals
-git add fd-physicalloans
+git add . && \
+rm -rf physicalloans-Graph/physical-rentals/.git && \
+git rm --cached -rf physicalloans-Graph/physical-rentals && \
+rm -rf fd-physicalloans/.git && \
+git rm --cached -rf fd-physicalloans && \
+git add physicalloans-Graph/physical-rentals && \
+git add fd-physicalloans 
 git commit -m "deploy physical rentals"
-git push // origin main
+git push // -u origin main
+
+git remote set-url origin https://github.com/usuario/repositorio2.git
+git push -u origin ma
 */
 
 const source = `
