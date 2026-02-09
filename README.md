@@ -26,12 +26,12 @@ This decentralized application (dApp) enables users to **lend or rent physical t
 Users can choose to **lend** or **rent** a physical tool. When a rental is requested, the tool owner must approve the condition of the tool before shipping.
 
 ### 2. Condition Validation Before Shipping
-- A **simulated AI system** verifies the tool is in good condition.
+- A **Gemini AI system** verifies the tool is in good condition.
 - This information is saved in **Supabase**.
 - The tool is sent to the renter.
 
 ### 3. Condition Validation Upon Arrival
-- When the renter receives the tool, another **simulated AI analysis** checks the tool’s current condition.
+- When the renter receives the tool, another **Gemini AI analysis** checks the tool’s current condition.
 - If validated as good, the **rental payment** is released and a **security deposit** is locked.
 
 ### 4. Automated Deadline Tracking
